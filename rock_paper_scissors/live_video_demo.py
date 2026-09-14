@@ -1,7 +1,7 @@
 import cv2
 from ultralytics import YOLO
 
-MODEL_PATH = "best.pt"
+MODEL_PATH = "best (1).pt"
 CONFIDENCE = 0.40
 
 model = YOLO(MODEL_PATH)
