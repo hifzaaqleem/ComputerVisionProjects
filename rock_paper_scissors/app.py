@@ -108,7 +108,7 @@ with st.sidebar:
     )
 
     if uploaded:
-        model_path = "/tmp/rps_best.pt"
+        model_path = "/tmp/rps_best (1).pt"
         with open(model_path, "wb") as f:
             f.write(uploaded.getbuffer())
     else:
