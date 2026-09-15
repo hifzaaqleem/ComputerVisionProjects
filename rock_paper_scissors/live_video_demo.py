@@ -1,10 +1,10 @@
 import cv2
 from ultralytics import YOLO
 
-MODEL_PATH = "best (1).pt"
+model_path = "best (1).pt"
 CONFIDENCE = 0.40
 
-model = YOLO(MODEL_PATH)
+model = YOLO(model_path)
 cap = cv2.VideoCapture(0)
 
 if not cap.isOpened():
