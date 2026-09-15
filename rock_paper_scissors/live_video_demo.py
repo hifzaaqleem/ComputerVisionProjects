@@ -155,4 +155,3 @@ st.sidebar.write(
 )
 
 st.sidebar.success("YOLO model loaded successfully.")
-```
