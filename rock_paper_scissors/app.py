@@ -75,7 +75,7 @@ EMOJI = {"Rock": "✊", "Paper": "✋", "Scissors": "✌️"}
 
 # Your notebook uses:
 # Paper, Rock, Scissors
-DEFAULT_MODEL = "best (1).pt"
+#DEFAULT_MODEL = "best (1).pt"
 
 
 def outcome(player, ai):
