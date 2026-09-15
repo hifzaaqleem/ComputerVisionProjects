@@ -1,80 +1,159 @@
-import cv2
+```python
 import os
+import av
+import cv2
+import streamlit as st
+from streamlit_webrtc import WebRtcMode, webrtc_streamer
 from ultralytics import YOLO
 
-# Fix path to locate 'best (1).pt' correctly in the same directory
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-model_path = os.path.join(BASE_DIR, "best (1).pt")
 
-model = YOLO(model_path)
-#model_path = "best (1).pt"
+# ------------------------------------------------------------
+# PAGE CONFIG
+# ------------------------------------------------------------
+st.set_page_config(
+    page_title="RPS Live YOLO",
+    page_icon="✊",
+    layout="wide"
+)
+
+st.title("✊ ✋ ✌️ RPS Live YOLO WebRTC Demo")
+st.write(
+    "Allow camera access below to stream live Rock, Paper, "
+    "Scissors detection."
+)
+
+
+# ------------------------------------------------------------
+# MODEL
+# ------------------------------------------------------------
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(BASE_DIR, "best.pt")
+
 CONFIDENCE = 0.40
 
-model = YOLO(model_path)
-cap = cv2.VideoCapture(0)
 
-if not cap.isOpened():
-    raise RuntimeError(
-        "Webcam could not be opened. Check camera permissions."
-    )
+@st.cache_resource
+def load_model():
+    if not os.path.exists(MODEL_PATH):
+        raise FileNotFoundError(
+            f"Model file not found: {MODEL_PATH}"
+        )
 
-print("RPS live detection started. Press Q to quit.")
+    return YOLO(MODEL_PATH)
 
-while True:
-    ok, frame = cap.read()
-    if not ok:
-        break
 
-    result = model.predict(
-        frame,
-        conf=CONFIDENCE,
-        imgsz=640,
-        verbose=False
-    )[0]
+model = load_model()
 
-    annotated = result.plot()
 
-    label = "No detection"
-    score = 0.0
+# ------------------------------------------------------------
+# YOLO VIDEO PROCESSOR
+# ------------------------------------------------------------
+class YOLOVideoTransformer:
 
-    if result.boxes is not None and len(result.boxes) > 0:
-        for box in result.boxes:
-            conf = float(box.conf[0])
-            cls_id = int(box.cls[0])
-            name = result.names.get(cls_id, str(cls_id))
+    def recv(self, frame: av.VideoFrame) -> av.VideoFrame:
 
-            if conf > score:
-                score = conf
-                label = name
+        # Convert WebRTC frame to OpenCV BGR image
+        img = frame.to_ndarray(format="bgr24")
 
-    cv2.rectangle(annotated, (10, 10), (480, 80), (20, 20, 20), -1)
+        # Run YOLO
+        result = model.predict(
+            img,
+            conf=CONFIDENCE,
+            imgsz=640,
+            verbose=False
+        )[0]
 
-    cv2.putText(
-        annotated,
-        f"Prediction: {label}",
-        (25, 42),
-        cv2.FONT_HERSHEY_SIMPLEX,
-        0.80,
-        (255, 255, 255),
-        2,
-        cv2.LINE_AA
-    )
+        # Draw YOLO bounding boxes
+        annotated = result.plot()
 
-    cv2.putText(
-        annotated,
-        f"Confidence: {score * 100:.1f}%",
-        (25, 68),
-        cv2.FONT_HERSHEY_SIMPLEX,
-        0.52,
-        (220, 220, 220),
-        1,
-        cv2.LINE_AA
-    )
+        # Default values
+        label = "No detection"
+        score = 0.0
 
-    cv2.imshow("RPS - Live YOLO Demo", annotated)
+        # Find strongest detection
+        if result.boxes is not None and len(result.boxes) > 0:
 
-    if cv2.waitKey(1) & 0xFF == ord("q"):
-        break
+            for box in result.boxes:
 
-cap.release()
-cv2.destroyAllWindows()
+                conf = float(box.conf[0])
+                cls_id = int(box.cls[0])
+
+                name = result.names.get(
+                    cls_id,
+                    str(cls_id)
+                )
+
+                if conf > score:
+                    score = conf
+                    label = name
+
+        # ----------------------------------------------------
+        # INFO PANEL
+        # ----------------------------------------------------
+        cv2.rectangle(
+            annotated,
+            (10, 10),
+            (480, 85),
+            (20, 20, 20),
+            -1
+        )
+
+        cv2.putText(
+            annotated,
+            f"Prediction: {label}",
+            (25, 42),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.80,
+            (255, 255, 255),
+            2,
+            cv2.LINE_AA
+        )
+
+        cv2.putText(
+            annotated,
+            f"Confidence: {score * 100:.1f}%",
+            (25, 70),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.52,
+            (220, 220, 220),
+            1,
+            cv2.LINE_AA
+        )
+
+        # Return processed frame
+        return av.VideoFrame.from_ndarray(
+            annotated,
+            format="bgr24"
+        )
+
+
+# ------------------------------------------------------------
+# WEBRTC CAMERA
+# ------------------------------------------------------------
+webrtc_streamer(
+    key="rps-live",
+    mode=WebRtcMode.SENDRECV,
+    video_processor_factory=YOLOVideoTransformer,
+    media_stream_constraints={
+        "video": True,
+        "audio": False
+    },
+    async_processing=True,
+)
+
+
+# ------------------------------------------------------------
+# SIDEBAR
+# ------------------------------------------------------------
+st.sidebar.header("⚙️ Settings")
+
+st.sidebar.write(
+    f"Confidence threshold: {CONFIDENCE:.2f}"
+)
+
+st.sidebar.write(
+    "Classes: Paper • Rock • Scissors"
+)
+
+st.sidebar.success("YOLO model loaded successfully.")
+```
