@@ -1,8 +1,8 @@
 streamlit==1.51.0
 streamlit-webrtc==0.64.5
 ultralytics
-opencv-python-headless
-numpy
+opencv-python-headless==4.10.0.84
+numpy==1.26.4
 pillow
 av==15.1.0
 aiortc==1.14.0
