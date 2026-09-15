@@ -75,7 +75,7 @@ EMOJI = {"Rock": "✊", "Paper": "✋", "Scissors": "✌️"}
 
 # Your notebook uses:
 # Paper, Rock, Scissors
-DEFAULT_MODEL = "best.pt"
+DEFAULT_MODEL = "best (1).pt"
 
 
 def outcome(player, ai):
@@ -104,7 +104,7 @@ with st.sidebar:
     uploaded = st.file_uploader(
         "Upload trained YOLO model",
         type=["pt"],
-        help="Use the best.pt produced by your notebook."
+        help="Use the best (1).pt produced by your notebook."
     )
 
     if uploaded:
