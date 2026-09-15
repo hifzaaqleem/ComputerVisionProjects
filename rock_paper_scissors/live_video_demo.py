@@ -1,7 +1,12 @@
 import cv2
 from ultralytics import YOLO
 
-model_path = "best (1).pt"
+# Fix path to locate 'best (1).pt' correctly in the same directory
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+model_path = os.path.join(BASE_DIR, "best (1).pt")
+
+model = YOLO(model_path)
+#model_path = "best (1).pt"
 CONFIDENCE = 0.40
 
 model = YOLO(model_path)
