@@ -1,4 +1,3 @@
-```python
 import os
 import av
 import cv2
