@@ -98,8 +98,6 @@ def load_model(path):
 # ============================================================
 # SIDEBAR & MODEL INITIALIZATION
 # ============================================================
-import os
-from ultralytics import YOLO
 
 # Set up absolute path for model weights in the repository
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
