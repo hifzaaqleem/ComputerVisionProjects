@@ -96,51 +96,48 @@ def load_model(path):
 
 
 # ============================================================
-# SIDEBAR
+# SIDEBAR & MODEL INITIALIZATION
 # ============================================================
+import os
+from ultralytics import YOLO
+
+# Set up absolute path for model weights in the repository
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+model_path = os.path.join(BASE_DIR, "best (1).pt")
+
 with st.sidebar:
-    st.header("⚙️ Model Settings")
+  st.header("⚙️ Model Settings")
 
-    uploaded = st.file_uploader(
-        "Upload trained YOLO model",
-        type=["pt"],
-        help="Use the best (1).pt produced by your notebook."
-    )
+  confidence = st.slider(
+      "Confidence threshold", 0.10, 0.95, 0.40, 0.05
+  )
 
-    if uploaded:
-        model_path = "/tmp/rps_best (1).pt"
-        with open(model_path, "wb") as f:
-            f.write(uploaded.getbuffer())
-    else:
-        model_path = DEFAULT_MODEL
+  st.divider()
+  st.write("**Model classes**")
+  st.write("✊ Rock")
+  st.write("✋ Paper")
+  st.write("✌️ Scissors")
 
-    confidence = st.slider(
-        "Confidence threshold",
-        0.10, 0.95, 0.40, 0.05
-    )
+  st.divider()
+  st.caption(
+      "The supplied notebook trains a YOLO detector for Paper, Rock "
+      "and Scissors at 640px for 15 epochs."
+  )
 
-    st.divider()
-    st.write("**Model classes**")
-    st.write("✊ Rock")
-    st.write("✋ Paper")
-    st.write("✌️ Scissors")
-
-    st.divider()
-    st.caption(
-        "The supplied notebook trains a YOLO detector for Paper, Rock "
-        "and Scissors at 640px for 15 epochs."
-    )
-
+# Check if model file exists before loading
 if not os.path.exists(model_path):
-    st.warning("Put `best (1).pt` beside `app.py`, or upload it in the sidebar.")
-    st.info("Notebook output path: /content/runs/detect/rock-paper-scissors-roboflow/weights/best (1).pt")
-    st.stop()
+  st.error(
+      f"❌ Error: Model weights file not found at: {model_path}. Make sure"
+      " 'best (1).pt' is pushed to your GitHub repository."
+  )
+  st.stop()
 
+# Load model directly
 try:
-    model = load_model(model_path)
+  model = YOLO(model_path)
 except Exception as e:
-    st.error(f"Model loading failed: {e}")
-    st.stop()
+  st.error(f"Model loading failed: {e}")
+  st.stop()
 
 
 # ============================================================
