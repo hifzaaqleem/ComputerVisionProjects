@@ -132,7 +132,7 @@ with st.sidebar:
     )
 
 if not os.path.exists(model_path):
-    st.warning("Put `best.pt` beside `app.py`, or upload it in the sidebar.")
+    st.warning("Put `best (1).pt` beside `app.py`, or upload it in the sidebar.")
     st.info("Notebook output path: /content/runs/detect/rock-paper-scissors-roboflow/weights/best (1).pt")
     st.stop()
 
