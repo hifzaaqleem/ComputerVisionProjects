@@ -1,71 +1,31 @@
-# RPS Vision Arena — Version 2
+# ✊ ✋ ✌️ AI-Powered Rock, Paper, Scissors Game
 
-This app uses the trained YOLO `best.pt` from the supplied
-Rock Paper Scissors notebook.
+A real-time **Rock, Paper, Scissors** game built using Python and Computer Vision. This project allows users to play the classic hand-gesture game directly against the computer using their webcam.
 
-## Your notebook model
+---
 
-The notebook reports:
-- Classes: Paper, Rock, Scissors
-- Epochs: 15
-- Image size: 640
-- Precision: 0.943
-- Recall: 0.891
-- mAP50: 0.937
-- mAP50-95: 0.731
+## 🚀 Features
+- **Real-Time Detection:** Tracks hand gestures instantly using webcam feed.
+- **Computer Vision Processing:** Utilizes advanced image processing/deep learning to accurately classify Rock, Paper, or Scissors.
+- **Interactive Gameplay:** Play rounds continuously with live score tracking.
+- **Lightweight & Fast:** Designed to run smoothly locally on standard hardware.
 
-The trained weights are produced at:
+---
 
-`/content/runs/detect/rock-paper-scissors-roboflow/weights/best.pt`
+## 🛠️ Tech Stack
+- **Programming Language:** Python 
+- **Libraries & Frameworks:** 
+  - `OpenCV` (for video capture and image manipulation)
+  - `MediaPipe` / `TensorFlow` / `PyTorch` *(Update based on whether you used MediaPipe landmarks or a custom CNN model)*
+  - `NumPy`
 
-Download `best.pt` from Colab and put it beside `app.py`.
+---
 
-## Install
-
-```bash
-pip install -r requirements.txt
-```
-
-For a local Streamlit run:
-
-```bash
-streamlit run app.py
-```
-
-For the OpenCV live demo:
-
-```bash
-python live_video_demo.py
-```
-
-Press Q to stop the OpenCV demo.
-
-## Version 2 features
-
-- Animated robot opponent
-- Browser webcam
-- YOLO bounding boxes
-- Rock / Paper / Scissors prediction
-- Confidence display
-- Automatic AI move
-- Winner calculation
-- Score tracking
-- Round counter
-- Countdown/progress bar
-- Image testing tab
-- Model information tab
-
-## Important deployment note
-
-For hosted Streamlit, browser webcam access normally requires HTTPS.
-Localhost works with normal browser camera permissions.
-
-## Suggested project structure
-
+## 📁 Project Structure
 ```text
-RPS_Vision_Arena/
-├── app.py
-├── live_video_demo.py
-├── requirements.txt
-└── best.pt
-```
+ComputerVisionProjects/
+│
+└── rock_paper_scissors/
+    ├── app.py              # Main application script
+    ├── model/              # (Optional) Trained model weights or cascades
+    └── requirements.txt    # Project dependencies
