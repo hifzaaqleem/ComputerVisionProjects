@@ -77,6 +77,30 @@ EMOJI = {"Rock": "✊", "Paper": "✋", "Scissors": "✌️"}
 # Paper, Rock, Scissors
 #DEFAULT_MODEL = "best (1).pt"
 
+# ============================================================
+# WEBRTC / ICE CONFIGURATION (STUN + free TURN fallback)
+# ============================================================
+RTC_CONFIGURATION = {
+    "iceServers": [
+        {"urls": ["stun:stun.l.google.com:19302"]},
+        {
+            "urls": ["turn:openrelay.metered.ca:80"],
+            "username": "openrelayproject",
+            "credential": "openrelayproject",
+        },
+        {
+            "urls": ["turn:openrelay.metered.ca:443"],
+            "username": "openrelayproject",
+            "credential": "openrelayproject",
+        },
+        {
+            "urls": ["turn:openrelay.metered.ca:443?transport=tcp"],
+            "username": "openrelayproject",
+            "credential": "openrelayproject",
+        },
+    ]
+}
+
 
 def outcome(player, ai):
     if player == ai:
@@ -414,11 +438,7 @@ with tab_game:
                     "video": True,
                     "audio": False
                 },
-                rtc_configuration={
-                    "iceServers": [
-                        {"urls": ["stun:stun.l.google.com:19302"]}
-                    ]
-                },
+                rtc_configuration=RTC_CONFIGURATION,
                 async_processing=True,
             )
 
@@ -460,11 +480,7 @@ with tab_live:
         "video": True,
         "audio": False
     },
-    rtc_configuration={
-        "iceServers": [
-            {"urls": ["stun:stun.l.google.com:19302"]}
-        ]
-    },
+    rtc_configuration=RTC_CONFIGURATION,
     async_processing=True,
 )
 
