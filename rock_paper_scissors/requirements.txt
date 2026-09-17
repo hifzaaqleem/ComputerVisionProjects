@@ -9,3 +9,4 @@ aiortc==1.14.0
 aioice==0.10.1
 torch
 torchvision
+requests
