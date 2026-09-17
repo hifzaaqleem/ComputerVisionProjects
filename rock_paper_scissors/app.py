@@ -457,7 +457,11 @@ with tab_game:
                 mode=WebRtcMode.SENDRECV,
                 video_processor_factory=RPSProcessor,
                 media_stream_constraints={
-                    "video": True,
+                    "video": {
+                        "width": {"ideal": 1280},
+                        "height": {"ideal": 720},
+                        "frameRate": {"ideal": 30},
+                    },
                     "audio": False
                 },
                 rtc_configuration=RTC_CONFIGURATION,
@@ -499,7 +503,11 @@ with tab_live:
     mode=WebRtcMode.SENDRECV,
     video_processor_factory=RPSProcessor,
     media_stream_constraints={
-        "video": True,
+        "video": {
+            "width": {"ideal": 1280},
+            "height": {"ideal": 720},
+            "frameRate": {"ideal": 30},
+        },
         "audio": False
     },
     rtc_configuration=RTC_CONFIGURATION,
