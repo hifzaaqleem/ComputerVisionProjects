@@ -4,6 +4,7 @@ import time
 import cv2
 import av
 import numpy as np
+import requests
 import streamlit as st
 from ultralytics import YOLO
 from streamlit_webrtc import webrtc_streamer, VideoProcessorBase, WebRtcMode
@@ -78,28 +79,49 @@ EMOJI = {"Rock": "✊", "Paper": "✋", "Scissors": "✌️"}
 #DEFAULT_MODEL = "best (1).pt"
 
 # ============================================================
-# WEBRTC / ICE CONFIGURATION (STUN + free TURN fallback)
+# WEBRTC / ICE CONFIGURATION
+# Fetches your own free Metered TURN credentials (20GB/month free).
+# Falls back to STUN-only if the fetch fails for any reason, so the
+# app doesn't crash even if secrets are missing or Metered is down.
 # ============================================================
-RTC_CONFIGURATION = {
-    "iceServers": [
-        {"urls": ["stun:stun.l.google.com:19302"]},
-        {
-            "urls": ["turn:openrelay.metered.ca:80"],
-            "username": "openrelayproject",
-            "credential": "openrelayproject",
-        },
-        {
-            "urls": ["turn:openrelay.metered.ca:443"],
-            "username": "openrelayproject",
-            "credential": "openrelayproject",
-        },
-        {
-            "urls": ["turn:openrelay.metered.ca:443?transport=tcp"],
-            "username": "openrelayproject",
-            "credential": "openrelayproject",
-        },
-    ]
-}
+FALLBACK_ICE_SERVERS = [{"urls": ["stun:stun.l.google.com:19302"]}]
+
+
+@st.cache_data(ttl=3000)  # refresh well before Metered's credentials expire
+def get_ice_servers():
+    try:
+        app_name = st.secrets["METERED_APP_NAME"]
+        api_key = st.secrets["METERED_API_KEY"]
+    except Exception:
+        st.warning(
+            "METERED_APP_NAME / METERED_API_KEY not found in secrets — "
+            "falling back to STUN-only, which may fail to connect on "
+            "restrictive networks.",
+            icon="⚠️",
+        )
+        return FALLBACK_ICE_SERVERS
+
+    try:
+        resp = requests.get(
+            f"https://{app_name}.metered.live/api/v1/turn/credentials",
+            params={"apiKey": api_key},
+            timeout=5,
+        )
+        resp.raise_for_status()
+        servers = resp.json()
+        if not servers:
+            raise ValueError("Empty iceServers response from Metered")
+        return servers
+    except Exception as e:
+        st.warning(
+            f"Could not fetch TURN credentials from Metered ({e}) — "
+            "falling back to STUN-only.",
+            icon="⚠️",
+        )
+        return FALLBACK_ICE_SERVERS
+
+
+RTC_CONFIGURATION = {"iceServers": get_ice_servers()}
 
 
 def outcome(player, ai):
